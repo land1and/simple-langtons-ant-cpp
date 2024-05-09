@@ -84,15 +84,22 @@ int main() {
         int8_t ant_direction_x = 0;
         int8_t ant_direction_y = 1;
         for (uint64_t j = 0; j < MAX_ITERATIONS; j++) {
-            const uint8_t _grid = grid[ant_position_y][ant_position_x];
-            const uint8_t _pattern = pattern[_grid];
-            const int8_t temp_x = ant_direction_x;
+            uint8_t _grid = grid[ant_position_y][ant_position_x];
+            uint8_t _pattern = pattern[_grid];
+            int8_t temp_x = ant_direction_x;
             ant_direction_x = _pattern ? -ant_direction_y : ant_direction_y;
             ant_direction_y = _pattern ? temp_x : -temp_x;
             grid[ant_position_y][ant_position_x] = _grid < size_minus_one ? _grid + 1 : 0;
             ant_position_x = ant_position_x + ant_direction_x;
+            if (ant_position_x < 0 || ant_position_x >= GRID_SIZE) break;
+            _grid = grid[ant_position_y][ant_position_x];
+            _pattern = pattern[_grid];
+            temp_x = ant_direction_x;
+            ant_direction_x = _pattern ? -ant_direction_y : ant_direction_y;
+            ant_direction_y = _pattern ? temp_x : -temp_x;
+            grid[ant_position_y][ant_position_x] = _grid < size_minus_one ? _grid + 1 : 0;
             ant_position_y = ant_position_y + ant_direction_y;
-            if (ant_position_x < 0 || ant_position_x >= GRID_SIZE || ant_position_y < 0 || ant_position_y >= GRID_SIZE) break;
+            if (ant_position_y < 0 || ant_position_y >= GRID_SIZE) break;
         }
         save_bmp((uint8_t*)grid, colors, (std::to_string(i) + ".bmp").c_str());
         delete[] pattern;   
