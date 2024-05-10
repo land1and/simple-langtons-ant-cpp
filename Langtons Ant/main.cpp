@@ -83,7 +83,7 @@ int main() {
         uint16_t ant_position_y = GRID_SIZE_HALF;
         int8_t ant_direction_x = 0;
         int8_t ant_direction_y = 1;
-        for (uint64_t j = 0; j < MAX_ITERATIONS; j++) {
+        for (uint64_t j = 0; j < MAX_ITERATIONS; j += 2) {
             uint8_t _grid = grid[ant_position_y][ant_position_x];
             uint8_t _pattern = pattern[_grid];
             int8_t temp_x = ant_direction_x;
