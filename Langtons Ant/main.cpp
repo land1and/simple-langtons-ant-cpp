@@ -13,43 +13,35 @@
 #define GRID_SIZE_HALF 500 // GRID_SIZE / 2
 #define GRID_SQUARED 1000000 // GRID_SIZE * GRID_SIZE
 #define GRID_INDEX 500500 // (GRID_SIZE * GRID_SIZE_HALF) + GRID_SIZE_HALF
-
-#define IMAGE_SIZE 3000000 // GRID_SQUARED * 3
-#define FILE_SIZE 3000054 // IMAGE_SIZE + 54
-#define RESOLUTION_PPM 3780 // PPI * 100 / 2.54
+#define FILE_SIZE 1000310 // GRID_SQUARED + 310
 
 static const uint8_t bmp_header[54] = {
     0x42, 0x4D, // bmp signature
     FILE_SIZE & 0xFF, (FILE_SIZE >> 8) & 0xFF, (FILE_SIZE >> 16) & 0xFF, (FILE_SIZE >> 24) & 0xFF, // file size
     0x00, 0x00, 0x00, 0x00, // reserved
-    0x36, 0x00, 0x00, 0x00, // offset to pixel data
+    0x36, 0x01, 0x00, 0x00, // offset to pixel data
     0x28, 0x00, 0x00, 0x00, // DIB header size
     GRID_SIZE & 0xFF, (GRID_SIZE >> 8) & 0xFF, 0x00, 0x00, GRID_SIZE & 0xFF, (GRID_SIZE >> 8) & 0xFF, 0x00, 0x00, // image width/height
     0x01, 0x00, // color planes
-    0x18, 0x00, // bits per pixel
+    0x8, 0x00, // bits per pixel
     0x00, 0x00, 0x00, 0x00, // compression method
-    IMAGE_SIZE & 0xFF, (IMAGE_SIZE >> 8) & 0xFF, (IMAGE_SIZE >> 16) & 0xFF, (IMAGE_SIZE >> 24) & 0xFF, // image size
-    RESOLUTION_PPM & 0xFF, (RESOLUTION_PPM >> 8) & 0xFF, 0x00, 0x00, RESOLUTION_PPM & 0xFF, (RESOLUTION_PPM >> 8) & 0xFF, 0x00, 0x00, // PPM resolution
-    0x00, 0x00, 0x00, 0x00, // color palette size
+    GRID_SQUARED & 0xFF, (GRID_SQUARED >> 8) & 0xFF, (GRID_SQUARED >> 16) & 0xFF, (GRID_SQUARED >> 24) & 0xFF, // image size
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // PPM resolution
+    0x40, 0x00, 0x00, 0x00, // color palette size
     0x00, 0x00, 0x00, 0x00 // important colors size
 };
 
-void save_bmp(const uint8_t* grid, const uint8_t* colors, const char* filename) {
+void save_bmp(const uint8_t* grid, const uint8_t* palette, const char* filename) {
     HANDLE fileHandle = CreateFileA(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (fileHandle == INVALID_HANDLE_VALUE) {
-        return;
-    }
+    if (fileHandle == INVALID_HANDLE_VALUE) return;
     DWORD written;
     WriteFile(fileHandle, bmp_header, sizeof(bmp_header), &written, NULL);
-    uint8_t* buffer = new uint8_t[IMAGE_SIZE];
-    uint8_t* dst = buffer;
+    WriteFile(fileHandle, palette, 256, &written, NULL);
+    uint8_t* buffer = new uint8_t[GRID_SQUARED];
     for (uint64_t i = 0; i < GRID_SQUARED; i++) {
-        uint8_t index = grid[i] * 3;
-        *dst++ = colors[index];
-        *dst++ = colors[++index];
-        *dst++ = colors[++index];
+        buffer[i] = grid[i];
     }
-    WriteFile(fileHandle, buffer, IMAGE_SIZE, &written, NULL);
+    WriteFile(fileHandle, buffer, GRID_SQUARED, &written, NULL);
     CloseHandle(fileHandle);
     delete[] buffer;
 }
@@ -69,13 +61,13 @@ uint8_t* create_binary_array(uint64_t value, uint8_t size) {
     return binary_array;
 }
 
-uint8_t* create_colors(uint8_t size) {
+uint8_t* create_palette(uint8_t size) {
     std::random_device rd;
     std::mt19937 eng(rd());
     std::uniform_int_distribution<> distr(0, 255);
-    uint8_t* colors = new uint8_t[size];
-    for (uint8_t i = 0; i < size; i++) {
-        colors[i] = distr(eng);
+    uint8_t* colors = new uint8_t[256];
+    for (uint16_t i = 0; i < 256; i++) {
+        colors[i] = i < size ? distr(eng) : 0;
     }
     return colors;
 }
@@ -90,7 +82,7 @@ void ant_thread(uint64_t start, uint64_t end) {
         const uint8_t size = highest_set_bit_position(i);
         const uint8_t size_minus_one = size - 1;
         const uint8_t* pattern = create_binary_array(i, size);
-        const uint8_t* colors = create_colors(size * 3);
+        const uint8_t* palette = create_palette(size * 4);
         uint8_t* grid = new uint8_t[GRID_SQUARED]();
         uint32_t index = GRID_INDEX;
         uint16_t ant_position_x = GRID_SIZE_HALF;
@@ -117,9 +109,9 @@ void ant_thread(uint64_t start, uint64_t end) {
             index += ant_direction_y * GRID_SIZE;
             if (ant_position_y < 0 || ant_position_y >= GRID_SIZE) break;
         }
-        save_bmp((uint8_t*)grid, colors, (std::to_string(i) + ".bmp").c_str());
+        save_bmp((uint8_t*)grid, palette, (std::to_string(i) + ".bmp").c_str());
         delete[] pattern;
-        delete[] colors;
+        delete[] palette;
         delete[] grid;
     }
 }
