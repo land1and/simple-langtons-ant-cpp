@@ -98,7 +98,7 @@ void ant_thread(uint64_t start, uint64_t end) {
             grid[index] = _grid < size_minus_one ? _grid + 1 : 0;
             ant_position_x = ant_position_x + ant_direction_x;
             index += ant_direction_x;
-            if (ant_position_x < 0 || ant_position_x >= GRID_SIZE) break;
+            if (ant_position_x >= GRID_SIZE) break;
             _grid = grid[index];
             _pattern = pattern[_grid];
             temp_x = ant_direction_x;
@@ -107,7 +107,7 @@ void ant_thread(uint64_t start, uint64_t end) {
             grid[index] = _grid < size_minus_one ? _grid + 1 : 0;
             ant_position_y = ant_position_y + ant_direction_y;
             index += ant_direction_y * GRID_SIZE;
-            if (ant_position_y < 0 || ant_position_y >= GRID_SIZE) break;
+            if (ant_position_y >= GRID_SIZE) break;
         }
         save_bmp((uint8_t*)grid, palette, (std::to_string(i) + ".bmp").c_str());
         delete[] pattern;
