@@ -9,11 +9,11 @@
 #define MAX_ITERATIONS 100000000 // some patterns develop extremely slowly so we need a cutoff
 #define NUM_THREADS -1 // number of threads to use, -1 for auto
 
-#define GRID_SIZE 1000 // size of the grid and resulting image
-#define GRID_SIZE_HALF 500 // GRID_SIZE / 2
-#define GRID_SQUARED 1000000 // GRID_SIZE * GRID_SIZE
-#define GRID_INDEX 500500 // (GRID_SIZE * GRID_SIZE_HALF) + GRID_SIZE_HALF
-#define FILE_SIZE 1000310 // GRID_SQUARED + 310
+#define GRID_SIZE 1024 // size of the grid and resulting image
+#define GRID_SIZE_HALF 512 // GRID_SIZE / 2
+#define GRID_SQUARED 1048576 // GRID_SIZE * GRID_SIZE
+#define GRID_INDEX 524800 // (GRID_SIZE * GRID_SIZE_HALF) + GRID_SIZE_HALF
+#define FILE_SIZE 1048886 // GRID_SQUARED + 310
 
 static const uint8_t bmp_header[54] = {
     0x42, 0x4D, // bmp signature
