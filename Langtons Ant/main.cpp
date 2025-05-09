@@ -34,9 +34,7 @@ static const uint8_t bmp_header[54] = {
 
 void save_bmp(const uint8_t* grid, const uint8_t* palette, const std::string& filename) {
     HANDLE handle = CreateFileA(filename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (handle == INVALID_HANDLE_VALUE) {
-        return;
-    }
+    if (handle == INVALID_HANDLE_VALUE) return;
     DWORD written;
     WriteFile(handle, bmp_header, 54, &written, NULL);
     WriteFile(handle, palette, 256, &written, NULL);
@@ -48,14 +46,10 @@ void ant_thread(const uint64_t start, const uint64_t end) {
     std::mt19937 gen = std::mt19937{ std::random_device{}() };
     std::uniform_int_distribution<> dist(0, 255);
     for (uint64_t i = start; i < end; ++i) {
-        if (!((i + 1) & i)) {
-            continue;
-        }
+        if (!((i + 1) & i)) continue;
         uint8_t size = 0;
         for (int8_t j = 63; j >= 0; --j) {
-            if (!(i & (1ULL << j))) {
-                continue;
-            }
+            if (!(i & (1ULL << j))) continue;
             size = j + 1;
             break;
         }
