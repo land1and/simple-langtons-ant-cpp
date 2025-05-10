@@ -9,7 +9,7 @@
 #define MAX_ITERATIONS 100000000 // max iterations
 #define NUM_THREADS -1 // number of threads to use, -1 for auto
 
-#define GRID_SIZE (1024 & ~3) // size of the grid and resulting image rounded down to the neaest multiple of 4
+#define GRID_SIZE (1024 & ~3) // size of the grid and resulting image rounded down to the nearest multiple of 4
 #define GRID_SIZE_HALF (GRID_SIZE / 2)
 #define GRID_SQUARED (GRID_SIZE * GRID_SIZE)
 #define GRID_INDEX (GRID_SIZE * GRID_SIZE_HALF) + GRID_SIZE_HALF
