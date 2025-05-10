@@ -24,7 +24,7 @@ static const uint8_t bmp_header[54] = {
     GRID_SIZE & 0xFF, (GRID_SIZE >> 8) & 0xFF, (GRID_SIZE >> 16) & 0xFF, (GRID_SIZE >> 24) & 0xFF, // width
     GRID_SIZE & 0xFF, (GRID_SIZE >> 8) & 0xFF, (GRID_SIZE >> 16) & 0xFF, (GRID_SIZE >> 24) & 0xFF, // height
     0x01, 0x00, // color planes
-    0x8, 0x00, // bits per pixel
+    0x08, 0x00, // bits per pixel
     0x00, 0x00, 0x00, 0x00, // compression
     GRID_SQUARED & 0xFF, (GRID_SQUARED >> 8) & 0xFF, (GRID_SQUARED >> 16) & 0xFF, (GRID_SQUARED >> 24) & 0xFF, // image size
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // ppm resolution
