@@ -4,12 +4,12 @@
 #include <random>
 
 #define START_PATTERN 0 // pattern to start from
-#define END_PATTERN 99 // pattern to end at
+#define NUM_PATTERNS 100 // number of patterns to compute
 #define INVERT_PATTERN false // reverse and flip the pattern, for example turning "101011" into "001010"
 #define MAX_ITERATIONS 100000000 // max iterations
 #define NUM_THREADS -1 // number of threads to use, -1 for auto
 
-#define GRID_SIZE (1024 & ~3) // size of the grid and resulting image rounded down to the neaest multiple of 4
+#define GRID_SIZE (1024 & ~3) // size of the grid and resulting image rounded down to the nearest multiple of 4
 #define GRID_SIZE_HALF (GRID_SIZE / 2)
 #define GRID_SQUARED (GRID_SIZE * GRID_SIZE)
 #define GRID_INDEX (GRID_SIZE * GRID_SIZE_HALF) + GRID_SIZE_HALF
@@ -24,7 +24,7 @@ static const uint8_t bmp_header[54] = {
     GRID_SIZE & 0xFF, (GRID_SIZE >> 8) & 0xFF, (GRID_SIZE >> 16) & 0xFF, (GRID_SIZE >> 24) & 0xFF, // width
     GRID_SIZE & 0xFF, (GRID_SIZE >> 8) & 0xFF, (GRID_SIZE >> 16) & 0xFF, (GRID_SIZE >> 24) & 0xFF, // height
     0x01, 0x00, // color planes
-    0x8, 0x00, // bits per pixel
+    0x08, 0x00, // bits per pixel
     0x00, 0x00, 0x00, 0x00, // compression
     GRID_SQUARED & 0xFF, (GRID_SQUARED >> 8) & 0xFF, (GRID_SQUARED >> 16) & 0xFF, (GRID_SQUARED >> 24) & 0xFF, // image size
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // ppm resolution
@@ -91,14 +91,15 @@ void ant_thread(const uint64_t start, const uint64_t end) {
 }
 
 int main() {
-    uint64_t num_patterns = END_PATTERN - START_PATTERN + 1;
-    uint64_t num_threads = std::min<uint64_t>(std::max<uint64_t>(NUM_THREADS < 0 ? std::thread::hardware_concurrency() : NUM_THREADS, 1U), num_patterns);
+    uint64_t start_pattern = std::max<uint64_t>(START_PATTERN, 0);
+    uint64_t num_patterns = std::max<uint64_t>(NUM_PATTERNS, 1);
+    uint64_t num_threads = std::min<uint64_t>(std::max<uint64_t>(NUM_THREADS < 0 ? std::thread::hardware_concurrency() : NUM_THREADS, 1), num_patterns);
     uint64_t patterns_per_thread = num_patterns / num_threads;
-    uint64_t extra = num_patterns % num_threads;
+    uint64_t remainder = num_patterns % num_threads;
     std::vector<std::thread> threads;
     for (uint64_t i = 0; i < num_threads; ++i) {
-        uint64_t start = START_PATTERN + (i * patterns_per_thread) + std::min<uint64_t>(i, extra);
-        uint64_t end = start + patterns_per_thread + (i < extra);
+        uint64_t start = start_pattern + (i * patterns_per_thread) + std::min<uint64_t>(i, remainder);
+        uint64_t end = start + patterns_per_thread + (i < remainder);
         threads.emplace_back(ant_thread, start, end);
     }
     for (std::thread& thread : threads) {
