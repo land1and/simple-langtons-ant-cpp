@@ -56,7 +56,7 @@ void ant_thread(const uint64_t start, const uint64_t end) {
         uint8_t size_minus_one = size - 1;
         uint8_t* pattern = new uint8_t[size];
         for (uint8_t j = 0; j < size; ++j) {
-            pattern[INVERT_PATTERN ? j : size - 1 - j] = ((i >> j) & 1) ^ INVERT_PATTERN;
+            pattern[INVERT_PATTERN ? j : size_minus_one - j] = ((i >> j) & 1) ^ INVERT_PATTERN;
         }
         uint8_t* palette = new uint8_t[256]();
         for (uint8_t j = 0; j < ((size * 4) - 1); ++j) {
