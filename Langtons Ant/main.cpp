@@ -47,13 +47,13 @@ void ant_thread(const uint64_t start, const uint64_t end) {
     std::uniform_int_distribution<> dist(0, 255);
     for (uint64_t i = start; i < end; ++i) {
         if (!((i + 1) & i)) continue;
-        uint8_t size = 0;
+        uint8_t size_minus_one = 0;
         for (int8_t j = 63; j >= 0; --j) {
             if (!(i & (1ULL << j))) continue;
-            size = j + 1;
+            size_minus_one = j;
             break;
         }
-        uint8_t size_minus_one = size - 1;
+        uint8_t size = size_minus_one + 1;
         uint8_t* pattern = new uint8_t[size];
         for (uint8_t j = 0; j < size; ++j) {
             pattern[INVERT_PATTERN ? j : size_minus_one - j] = ((i >> j) & 1) ^ INVERT_PATTERN;
