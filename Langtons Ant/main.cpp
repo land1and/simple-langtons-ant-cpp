@@ -4,7 +4,7 @@
 #include <random>
 
 #define START_PATTERN 0 // pattern to start from
-#define NUM_PATTERNS 100 // number of patterns to compute
+#define NUM_PATTERNS 100 // number of patterns
 #define INVERT_PATTERN false // reverse and flip the pattern, for example turning "101011" into "001010"
 #define MAX_ITERATIONS 100000000 // max iterations
 #define NUM_THREADS -1 // number of threads to use, -1 for auto
