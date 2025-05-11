@@ -4,7 +4,7 @@
 #include <random>
 
 #define START_PATTERN 0 // pattern to start from
-#define NUM_PATTERNS 100 // number of patterns to compute
+#define NUM_PATTERNS 100 // number of patterns
 #define INVERT_PATTERN false // reverse and flip the pattern, for example turning "101011" into "001010"
 #define MAX_ITERATIONS 100000000 // max iterations
 #define NUM_THREADS -1 // number of threads to use, -1 for auto
@@ -47,37 +47,36 @@ void ant_thread(const uint64_t start, const uint64_t end) {
     std::uniform_int_distribution<> dist(0, 255);
     for (uint64_t i = start; i < end; ++i) {
         if (!((i + 1) & i)) continue;
-        uint8_t size = 0;
+        uint8_t size_minus_one = 0;
         for (int8_t j = 63; j >= 0; --j) {
             if (!(i & (1ULL << j))) continue;
-            size = j + 1;
+            size_minus_one = j;
             break;
         }
-        uint8_t size_minus_one = size - 1;
+        uint8_t size = size_minus_one + 1;
         uint8_t* pattern = new uint8_t[size];
         for (uint8_t j = 0; j < size; ++j) {
-            pattern[INVERT_PATTERN ? j : size - 1 - j] = ((i >> j) & 1) ^ INVERT_PATTERN;
+            pattern[INVERT_PATTERN ? j : size_minus_one - j] = ((i >> j) & 1) ^ INVERT_PATTERN;
         }
-        uint8_t* palette = new uint8_t[256]();
+        uint8_t* palette = new uint8_t[256];
         for (uint8_t j = 0; j < ((size * 4) - 1); ++j) {
             palette[j] = dist(gen);
         }
         uint8_t* grid = new uint8_t[GRID_SQUARED]();
         uint32_t index = GRID_INDEX;
-        uint16_t ant_position_x = GRID_SIZE_HALF;
-        uint16_t ant_position_y = GRID_SIZE_HALF;
-        int8_t ant_direction = 1;
+        uint32_t ant_position_x = GRID_SIZE_HALF;
+        uint32_t ant_position_y = GRID_SIZE_HALF;
+        int32_t ant_direction = 1;
+        uint32_t state = 0;
         for (uint64_t j = 0; j < MAX_ITERATIONS; j += 2) {
-            uint8_t state = grid[index];
-            uint8_t next = state < size_minus_one ? state + 1 : 0;
-            grid[index] = next;
+            state = grid[index];
+            grid[index] = state < size_minus_one ? state + 1 : 0;
             if (pattern[state]) ant_direction = -ant_direction;
             index += ant_direction;
             ant_position_x += ant_direction;
             if (ant_position_x >= GRID_SIZE) break;
             state = grid[index];
-            next = state < size_minus_one ? state + 1 : 0;
-            grid[index] = next;
+            grid[index] = state < size_minus_one ? state + 1 : 0;
             if (!pattern[state]) ant_direction = -ant_direction;
             index += ant_direction * GRID_SIZE;
             ant_position_y += ant_direction;
