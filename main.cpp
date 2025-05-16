@@ -50,7 +50,7 @@ void ant_thread(const uint64_t start, const uint64_t end) {
     uint32_t size_4_1 = 0;
     uint8_t* pattern = new uint8_t[64];
     uint8_t* palette = new uint8_t[256];
-    uint8_t* grid = new uint8_t[GRID_SQUARED]();
+    uint8_t* grid = new uint8_t[GRID_SQUARED];
     uint32_t index = 0;
     uint32_t ant_position_x = 0;
     uint32_t ant_position_y = 0;
