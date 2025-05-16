@@ -83,13 +83,12 @@ void ant_thread(const uint64_t start, const uint64_t end) {
             if (pattern[state]) ant_direction = -ant_direction;
             index += ant_direction;
             ant_position_x += ant_direction;
-            if (ant_position_x >= GRID_SIZE) break;
             state = grid[index];
             grid[index] = state < size_minus_one ? state + 1 : 0;
             if (!pattern[state]) ant_direction = -ant_direction;
             index += ant_direction * GRID_SIZE;
             ant_position_y += ant_direction;
-            if (ant_position_y >= GRID_SIZE) break;
+            if (ant_position_x >= GRID_SIZE || ant_position_y >= GRID_SIZE) break;
         }
         save_bmp(grid, palette, std::to_string(i) + ".bmp");
     }
