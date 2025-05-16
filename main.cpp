@@ -71,6 +71,7 @@ void ant_thread(const uint64_t start, const uint64_t end) {
         for (uint32_t j = 0; j < size_4_1; ++j) {
             palette[j] = dist(gen);
         }
+        std::memset(grid, 0, GRID_SQUARED);
         index = GRID_INDEX;
         ant_position_x = GRID_SIZE_HALF;
         ant_position_y = GRID_SIZE_HALF;
@@ -90,7 +91,6 @@ void ant_thread(const uint64_t start, const uint64_t end) {
             ant_position_y += ant_direction;
             if (ant_position_y >= GRID_SIZE) break;
         }
-        std::memset(grid, 0, GRID_SQUARED);
         save_bmp(grid, palette, std::to_string(i) + ".bmp");
     }
     delete[] pattern;
